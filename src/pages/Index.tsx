@@ -169,15 +169,17 @@ export default function Index() {
       newZ = Math.max(-8, Math.min(8, newZ));
 
       const distanceToFish = Math.sqrt(
-        Math.pow(newX - fishPosition.x, 2) + Math.pow(newZ - fishPosition.z, 2)
+        Math.pow(newX - fishPosition.x, 2) + 
+        Math.pow(0 - fishPosition.y, 2) + 
+        Math.pow(newZ - fishPosition.z, 2)
       );
 
-      if (distanceToFish < 0.8) {
+      if (distanceToFish < 1.0) {
         setScore((prev) => prev + 100);
         setGameState('won');
         toast({
           title: '🎉 Победа!',
-          description: 'Кот успешно украл рыбу!',
+          description: 'Кот поймал рыбу!',
         });
         return;
       }
@@ -248,11 +250,26 @@ export default function Index() {
     const render = () => {
       const currentLevel = LEVELS[selectedLevel];
 
-      ctx.fillStyle = currentLevel.bgColor;
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGradient.addColorStop(0, currentLevel.bgColor);
+      bgGradient.addColorStop(1, currentLevel.floorColor);
+      ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = currentLevel.floorColor;
+      const floorGradient = ctx.createLinearGradient(0, canvas.height - 100, 0, canvas.height);
+      floorGradient.addColorStop(0, currentLevel.floorColor);
+      floorGradient.addColorStop(1, '#000000');
+      ctx.fillStyle = floorGradient;
       ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+      
+      for (let i = 0; i < 10; i++) {
+        ctx.strokeStyle = `rgba(255,255,255,${0.1 - i * 0.01})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 100 + i * 10);
+        ctx.lineTo(canvas.width, canvas.height - 100 + i * 10);
+        ctx.stroke();
+      }
 
       const toScreen = (pos: Position) => {
         const scale = 30;
@@ -265,35 +282,81 @@ export default function Index() {
       };
 
       const table = toScreen({ x: 0, y: 0.5, z: 3 });
+      
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+      
       ctx.fillStyle = currentLevel.tableColor;
+      ctx.beginPath();
+      ctx.ellipse(table.x, table.y, 120 * table.scale, 80 * table.scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      
+      const gradient = ctx.createRadialGradient(
+        table.x - 30, table.y - 20, 10,
+        table.x, table.y, 120 * table.scale
+      );
+      gradient.addColorStop(0, 'rgba(255,255,255,0.4)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
+      ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.ellipse(table.x, table.y, 120 * table.scale, 80 * table.scale, 0, 0, Math.PI * 2);
       ctx.fill();
 
       const fish = toScreen(fishPosition);
+      
+      ctx.shadowColor = 'rgba(249,115,22,0.5)';
+      ctx.shadowBlur = 20;
       ctx.fillStyle = '#F97316';
+      
+      const bobbing = Math.sin(Date.now() / 500) * 5;
       ctx.font = `${48 * fish.scale}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🐟', fish.x, fish.y);
+      ctx.fillText('🐟', fish.x, fish.y + bobbing);
+      
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
 
       enemies.forEach((enemy) => {
         const pos = toScreen(enemy.position);
         const emoji =
           enemy.type === 'mouse' ? '🐭' : enemy.type === 'dog' ? '🐕' : '👮';
+        
+        ctx.shadowColor = 'rgba(239,68,68,0.4)';
+        ctx.shadowBlur = 15;
         ctx.font = `${40 * pos.scale}px Arial`;
         ctx.fillText(emoji, pos.x, pos.y);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
 
         ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, enemy.radius * 30 * pos.scale, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.setLineDash([]);
       });
 
       const cat = toScreen(catPosition);
+      
+      ctx.shadowColor = 'rgba(139,92,246,0.6)';
+      ctx.shadowBlur = 25;
       ctx.font = `${40 * cat.scale}px Arial`;
       ctx.fillText('🐈‍⬛', cat.x, cat.y);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      
+      ctx.strokeStyle = '#8B5CF6';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cat.x, cat.y, 25 * cat.scale, 0, Math.PI * 2);
+      ctx.stroke();
     };
 
     if (gameState === 'playing') {
