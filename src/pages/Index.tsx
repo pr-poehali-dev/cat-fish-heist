@@ -290,10 +290,10 @@ export default function Index() {
       let newX = catPosition.x;
       let newZ = catPosition.z;
 
-      if (keys.has('arrowup') || keys.has('w')) newZ += speed;
-      if (keys.has('arrowdown') || keys.has('s')) newZ -= speed;
-      if (keys.has('arrowleft') || keys.has('a')) newX -= speed;
-      if (keys.has('arrowright') || keys.has('d')) newX += speed;
+      if (keys.has('arrowup') || keys.has('w') || keys.has('i')) newZ += speed;
+      if (keys.has('arrowdown') || keys.has('s') || keys.has('k')) newZ -= speed;
+      if (keys.has('arrowleft') || keys.has('a') || keys.has('j')) newX -= speed;
+      if (keys.has('arrowright') || keys.has('d') || keys.has('l')) newX += speed;
 
       newX = Math.max(-8, Math.min(8, newX));
       newZ = Math.max(-8, Math.min(8, newZ));
@@ -457,6 +457,12 @@ export default function Index() {
         const emoji =
           enemy.type === 'mouse' ? '🐭' : enemy.type === 'dog' ? '🐕' : enemy.type === 'guard' ? '👮' : '🐻';
         
+        const shadowPos = toScreen({ x: enemy.position.x, y: -0.5, z: enemy.position.z });
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(shadowPos.x, shadowPos.y + 60, 30 * pos.scale, 15 * pos.scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.shadowColor = 'rgba(239,68,68,0.4)';
         ctx.shadowBlur = 15;
         ctx.font = `${40 * pos.scale}px Arial`;
@@ -474,6 +480,12 @@ export default function Index() {
       });
 
       const cat = toScreen(catPosition);
+      
+      const catShadowPos = toScreen({ x: catPosition.x, y: -0.5, z: catPosition.z });
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(catShadowPos.x, catShadowPos.y + 60, 25 * cat.scale, 12 * cat.scale, 0, 0, Math.PI * 2);
+      ctx.fill();
       
       ctx.shadowColor = 'rgba(139,92,246,0.6)';
       ctx.shadowBlur = 25;
@@ -587,7 +599,11 @@ export default function Index() {
 
             <div className="mt-8 p-4 bg-accent/10 rounded-lg">
               <h3 className="font-semibold mb-2">🎮 Управление:</h3>
-              <p className="text-sm">Стрелки или WASD для движения</p>
+              <div className="text-sm space-y-1">
+                <p>↑ ↓ ← → - Стрелки</p>
+                <p>W A S D - Классическое управление</p>
+                <p>I J K L - Альтернативное управление</p>
+              </div>
             </div>
           </div>
         </Card>
@@ -668,7 +684,7 @@ export default function Index() {
         </Card>
 
         <div className="mt-4 text-center text-sm text-muted-foreground bg-white/60 py-2 rounded-lg">
-          Используй стрелки ← ↑ → ↓ или WASD для движения
+          🎮 Управление: ↑↓←→ / WASD / IJKL
         </div>
       </div>
     </div>
