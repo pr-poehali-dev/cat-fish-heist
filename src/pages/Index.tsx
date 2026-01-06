@@ -10,7 +10,7 @@ type GameState = 'menu' | 'playing' | 'won' | 'lost';
 interface Enemy {
   position: Position;
   velocity: Position;
-  type: 'mouse' | 'dog' | 'guard';
+  type: 'mouse' | 'dog' | 'guard' | 'bear';
   radius: number;
   patrolPath?: Position[];
   patrolIndex?: number;
@@ -95,6 +95,136 @@ const LEVELS: Level[] = [
     floorColor: '#1F2937',
     tableColor: '#92400E',
     emoji: '🕯️',
+  },
+  {
+    id: 6,
+    name: 'Уровень 6: Веранда',
+    location: 'veranda',
+    enemies: 4,
+    enemySpeed: 2.2,
+    lives: 2,
+    timeLimit: 28,
+    bgColor: '#FDE68A',
+    floorColor: '#F59E0B',
+    tableColor: '#14B8A6',
+    emoji: '🌺',
+  },
+  {
+    id: 7,
+    name: 'Уровень 7: Лес',
+    location: 'forest',
+    enemies: 5,
+    enemySpeed: 2.4,
+    lives: 2,
+    timeLimit: 26,
+    bgColor: '#86EFAC',
+    floorColor: '#16A34A',
+    tableColor: '#78350F',
+    emoji: '🌲',
+  },
+  {
+    id: 8,
+    name: 'Уровень 8: Пляж',
+    location: 'beach',
+    enemies: 5,
+    enemySpeed: 2.6,
+    lives: 2,
+    timeLimit: 24,
+    bgColor: '#FDE047',
+    floorColor: '#FACC15',
+    tableColor: '#0891B2',
+    emoji: '🏖️',
+  },
+  {
+    id: 9,
+    name: 'Уровень 9: Пещера',
+    location: 'cave',
+    enemies: 6,
+    enemySpeed: 2.8,
+    lives: 1,
+    timeLimit: 22,
+    bgColor: '#64748B',
+    floorColor: '#334155',
+    tableColor: '#7C2D12',
+    emoji: '⛰️',
+  },
+  {
+    id: 10,
+    name: 'Уровень 10: Крыша',
+    location: 'roof',
+    enemies: 6,
+    enemySpeed: 3.0,
+    lives: 1,
+    timeLimit: 20,
+    bgColor: '#C7D2FE',
+    floorColor: '#6366F1',
+    tableColor: '#DC2626',
+    emoji: '🌃',
+  },
+  {
+    id: 11,
+    name: 'Уровень 11: Чердак',
+    location: 'attic',
+    enemies: 7,
+    enemySpeed: 3.2,
+    lives: 1,
+    timeLimit: 18,
+    bgColor: '#D1D5DB',
+    floorColor: '#6B7280',
+    tableColor: '#B91C1C',
+    emoji: '📦',
+  },
+  {
+    id: 12,
+    name: 'Уровень 12: Парк',
+    location: 'park',
+    enemies: 7,
+    enemySpeed: 3.4,
+    lives: 1,
+    timeLimit: 17,
+    bgColor: '#BBF7D0',
+    floorColor: '#4ADE80',
+    tableColor: '#F59E0B',
+    emoji: '🎡',
+  },
+  {
+    id: 13,
+    name: 'Уровень 13: Мост',
+    location: 'bridge',
+    enemies: 8,
+    enemySpeed: 3.6,
+    lives: 1,
+    timeLimit: 16,
+    bgColor: '#93C5FD',
+    floorColor: '#3B82F6',
+    tableColor: '#EA580C',
+    emoji: '🌉',
+  },
+  {
+    id: 14,
+    name: 'Уровень 14: Завод',
+    location: 'factory',
+    enemies: 8,
+    enemySpeed: 3.8,
+    lives: 1,
+    timeLimit: 15,
+    bgColor: '#9CA3AF',
+    floorColor: '#4B5563',
+    tableColor: '#F97316',
+    emoji: '🏭',
+  },
+  {
+    id: 15,
+    name: 'Уровень 15: Вулкан',
+    location: 'volcano',
+    enemies: 10,
+    enemySpeed: 4.0,
+    lives: 1,
+    timeLimit: 15,
+    bgColor: '#FCA5A5',
+    floorColor: '#DC2626',
+    tableColor: '#000000',
+    emoji: '🌋',
   },
 ];
 
@@ -325,7 +455,7 @@ export default function Index() {
       enemies.forEach((enemy) => {
         const pos = toScreen(enemy.position);
         const emoji =
-          enemy.type === 'mouse' ? '🐭' : enemy.type === 'dog' ? '🐕' : '👮';
+          enemy.type === 'mouse' ? '🐭' : enemy.type === 'dog' ? '🐕' : enemy.type === 'guard' ? '👮' : '🐻';
         
         ctx.shadowColor = 'rgba(239,68,68,0.4)';
         ctx.shadowBlur = 15;
@@ -377,7 +507,7 @@ export default function Index() {
       const angle = (i / level.enemies) * Math.PI * 2;
       const radius = 4;
       const type: Enemy['type'] =
-        i === 0 ? 'mouse' : i === 1 ? 'dog' : 'guard';
+        i === 0 ? 'mouse' : i === 1 ? 'dog' : i === 2 ? 'guard' : 'bear';
 
       const patrolRadius = 3 + i;
       const patrolPath: Position[] = [];
@@ -398,7 +528,7 @@ export default function Index() {
         },
         velocity: { x: 0, y: 0, z: 0 },
         type,
-        radius: type === 'mouse' ? 0.8 : type === 'dog' ? 1.2 : 1.0,
+        radius: type === 'mouse' ? 0.8 : type === 'dog' ? 1.2 : type === 'guard' ? 1.0 : 1.5,
         patrolPath,
         patrolIndex: 0,
       });
